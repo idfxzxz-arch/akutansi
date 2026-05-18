@@ -11,24 +11,8 @@ app.use(
 
 app.use(express.json());
 
-let transactions = [
-  {
-    id: 1,
-    type: "income",
-    title: "Modal awal",
-    category: "Modal",
-    amount: 1000000,
-    date: "2026-05-18",
-  },
-  {
-    id: 2,
-    type: "expense",
-    title: "Beli perlengkapan",
-    category: "Operasional",
-    amount: 150000,
-    date: "2026-05-18",
-  },
-];
+let transactions = [];
+let nextId = 1;
 
 app.get("/api/health", (req, res) => {
   res.json({
@@ -72,7 +56,7 @@ app.post("/api/transactions", (req, res) => {
   }
 
   const newTransaction = {
-    id: Date.now(),
+    id: nextId++,
     type,
     title,
     category,
@@ -92,6 +76,15 @@ app.post("/api/transactions", (req, res) => {
 app.put("/api/transactions/:id", (req, res) => {
   const id = Number(req.params.id);
   const { type, title, category, amount, date } = req.body;
+
+  const transactionExists = transactions.some((item) => item.id === id);
+
+  if (!transactionExists) {
+    return res.status(404).json({
+      success: false,
+      message: "Transaksi tidak ditemukan",
+    });
+  }
 
   transactions = transactions.map((item) =>
     item.id === id
@@ -114,6 +107,15 @@ app.put("/api/transactions/:id", (req, res) => {
 
 app.delete("/api/transactions/:id", (req, res) => {
   const id = Number(req.params.id);
+
+  const transactionExists = transactions.some((item) => item.id === id);
+
+  if (!transactionExists) {
+    return res.status(404).json({
+      success: false,
+      message: "Transaksi tidak ditemukan",
+    });
+  }
 
   transactions = transactions.filter((item) => item.id !== id);
 
