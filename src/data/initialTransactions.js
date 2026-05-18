@@ -1,2 +1,1 @@
-let transactions = [];
-let nextId = 1;
+export const initialTransactions = [];
